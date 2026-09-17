@@ -100,7 +100,8 @@ button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--focus);out
 /* two panes */
 .split{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(320px,1fr);gap:14px;align-items:start}
 .split.chat{grid-template-columns:minmax(0,1.5fr) minmax(280px,.8fr)}
-@media (max-width:900px){.split,.split.chat{grid-template-columns:1fr}}
+.split.plan{grid-template-columns:minmax(0,7fr) minmax(280px,3fr)}
+@media (max-width:900px){.split,.split.chat,.split.plan{grid-template-columns:1fr}}
 .tablewrap{background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:hidden}
 .tablewrap .scroll{overflow-x:auto}
 table{border-collapse:collapse;width:100%;min-width:640px}
@@ -158,9 +159,26 @@ td .sub{color:var(--muted);font-size:12px}
 .tcard .tm{font-family:var(--mono);font-size:11px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
 .tcard .unread{font-family:var(--mono);font-size:10.5px;background:var(--parent-soft);color:var(--parent);padding:0 6px;border-radius:999px}
 
+/* goal list (right pane of plan) */
+.gcard{display:grid;gap:4px;padding:10px 14px;border-bottom:1px solid var(--line);cursor:pointer;width:100%;text-align:left}
+.gcard:last-child{border-bottom:0}
+.gcard:hover{background:var(--surface-2)}
+.gcard[aria-selected="true"]{background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent)}
+.gcard .tt{font-weight:500;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.gcard .tm{font-family:var(--mono);font-size:11px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
+.gdetail{background:var(--surface);border:1px solid var(--line);border-radius:8px}
+.gdetail header{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.gdetail header h3{margin:0;font-size:16px;font-weight:600;flex:1;text-wrap:balance}
+.gdetail .gdesc{padding:10px 16px 4px}
+.gdetail .obj{margin:10px 16px}
+.gdetail .facts{padding:8px 16px 4px}
+
 /* activity log */
 .log{background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:hidden}
 .log .row{display:grid;grid-template-columns:150px 170px 1fr;gap:12px;padding:9px 14px;border-bottom:1px solid var(--line);font-size:13px;align-items:baseline}
+.log.sess .row{grid-template-columns:150px 150px 1fr 150px}
+.log .row .ss{font-family:var(--mono);font-size:12px}
+.log .row .ss .sep{color:var(--muted);font-family:var(--sans)}
 .log .row:last-child{border-bottom:0}
 .log .row .ts{font-family:var(--mono);font-size:12px;color:var(--muted)}
 .log .row .ev{font-weight:500}
@@ -240,10 +258,10 @@ td .sub{color:var(--muted);font-size:12px}
 
   <!-- §3 chat -->
   <section class="panel on" id="p-chat" role="tabpanel" aria-labelledby="tab-chat">
-    <div class="toolbar"><span class="muted small">Messages on the left, the parent's threads on the right. The most recently active thread opens first.</span><span class="spec-ref" style="margin-left:auto">§3</span></div>
+    <div class="toolbar"><span class="muted small">Messages on the left, the profile's threads on the right. The most recently active thread opens first.</span><span class="spec-ref" style="margin-left:auto">§3</span></div>
     <div class="split chat">
       <div class="chatwrap" id="chat-pane"></div>
-      <aside class="threads" id="thread-list" aria-label="Threads"></aside>
+      <aside class="threads" id="thread-list" aria-label="Threads on this profile"></aside>
     </div>
   </section>
 
@@ -289,18 +307,23 @@ td .sub{color:var(--muted);font-size:12px}
       <span class="spec-ref" style="margin-left:auto">§5</span>
     </div>
 
-    <div id="pp-plan-view" class="plan">
-      <div class="planhead">
-        <div class="kv"><span class="k">Owning specialist</span><span class="v">Dr. Huda M. <span class="id">[20931]</span></span></div>
-        <div class="kv"><span class="k">Created</span><span class="v mono">21/07/2026</span></div>
-        <div class="kv"><span class="k">Last updated</span><span class="v mono">13/09/2026 11:40</span></div>
-        <div class="kv"><span class="k">Parent last viewed</span><span class="v mono">14/09/2026 20:05</span></div>
+    <div id="pp-plan-view">
+      <div class="plan" style="margin-bottom:14px">
+        <div class="planhead" style="border-bottom:0">
+          <div class="kv"><span class="k">Owning specialist</span><span class="v">Dr. Huda M. <span class="id">[20931]</span></span></div>
+          <div class="kv"><span class="k">Created</span><span class="v mono">21/07/2026</span></div>
+          <div class="kv"><span class="k">Last updated</span><span class="v mono">13/09/2026 11:40</span></div>
+          <div class="kv"><span class="k">Parent last viewed</span><span class="v mono">14/09/2026 20:05</span></div>
+          <div class="kv"><span class="k">Goals</span><span class="v">2 active · 1 completed</span></div>
+        </div>
       </div>
-      <div id="pp-goals"></div>
+      <div class="split plan">
+        <div class="gdetail" id="pp-goal"></div>
+        <aside class="threads" id="pp-goals" aria-label="Goals"></aside>
+      </div>
     </div>
 
     <div id="pp-log-view" hidden>
-      <div class="chips" id="pp-log-chips" style="margin-bottom:10px" aria-label="Filter by event type"></div>
       <div class="log" id="pp-log"></div>
     </div>
   </section>
@@ -343,29 +366,21 @@ const TASKS = [
      {who:"parent", media:"photo", ts:"04/09/2026 17:30", read:"18:02"},
      {who:"specialist", text:"Perfect lip shape. Marking this objective complete.", ts:"04/09/2026 18:03", read:"19:00"},
    ]},
-  {id:"T-402", title:"Read one picture book together", desc:"Any book. Point at the pictures and name them slowly.", status:"done", setBy:"specialist", obj:null, session:null, assignedBy:PREV, assignedAt:"24/07/2026 10:00", updated:"30/07/2026 09:15", viewed:"25/07/2026 21:10", comments:[]},
+  {id:"T-402", title:"Read one picture book together", desc:"Any book. Point at the pictures and name them slowly.", status:"done", setBy:"parent", obj:null, session:null, assignedBy:PREV, assignedAt:"24/07/2026 10:00", updated:"30/07/2026 09:15", viewed:"25/07/2026 21:10", comments:[]},
 ];
 
 const HP_LOG = [
-  {ts:"14/09/2026 20:11", ev:"Comment added", who:"parent", pl:'<b>Mirror game</b> · voice'},
-  {ts:"12/09/2026 12:05", ev:"Task viewed by parent", who:"parent", pl:'<b>Sound cards, week 3</b>'},
-  {ts:"12/09/2026 09:20", ev:"Comment added", who:"specialist", pl:'<b>Sound cards, week 3</b> · file'},
-  {ts:"11/09/2026 20:05", ev:"Comment added", who:"specialist", pl:'<b>Mirror game</b> · text'},
-  {ts:"11/09/2026 19:40", ev:"Comment added", who:"parent", pl:'<b>Mirror game</b> · text'},
-  {ts:"09/09/2026 18:36", ev:"Comment added", who:"specialist", pl:'<b>Mirror game</b> · text'},
-  {ts:"09/09/2026 18:05", ev:"Comment added", who:"parent", pl:'<b>Mirror game</b> · text'},
-  {ts:"09/09/2026 08:15", ev:"Task viewed by parent", who:"parent", pl:'<b>Mirror game</b>'},
-  {ts:"08/09/2026 19:32", ev:"Task assigned", who:"specialist", pl:'<b>Sound cards, week 3</b> · from session <a href="#">S-9021</a>'},
-  {ts:"08/09/2026 19:30", ev:"Task assigned", who:"specialist", pl:'<b>Mirror game</b> · from session <a href="#">S-9021</a>'},
-  {ts:"07/09/2026 21:39", ev:"Status set", who:"parent", pl:'<b>Name three things at bath time</b> · <span class="chg">To Do → Incomplete</span>'},
-  {ts:"06/09/2026 19:02", ev:"Status set", who:"parent", pl:'<b>Blow bubbles</b> · <span class="chg">To Do → Done</span>'},
-  {ts:"04/09/2026 18:03", ev:"Comment added", who:"specialist", pl:'<b>Blow bubbles</b> · text'},
-  {ts:"04/09/2026 17:30", ev:"Comment added", who:"parent", pl:'<b>Blow bubbles</b> · photo'},
-  {ts:"01/09/2026 18:10", ev:"Task assigned", who:"specialist", pl:'<b>Name three things at bath time</b> · from session <a href="#">S-8877</a>'},
-  {ts:"01/09/2026 18:08", ev:"Task assigned", who:"specialist", pl:'<b>Blow bubbles</b> · from session <a href="#">S-8877</a>'},
-  {ts:"18/08/2026 10:00", ev:"Handed to a new specialist", who:"specialist", pl:'Dr. Omar K. <span class="chg">[20877]</span> → Dr. Huda M. <span class="chg">[20931]</span>'},
-  {ts:"30/07/2026 09:15", ev:"Status set", who:"specialist", pl:'<b>Read one picture book</b> · <span class="chg">To Do → Done</span>'},
-  {ts:"24/07/2026 10:00", ev:"Task assigned", who:"specialist", pl:'<b>Read one picture book</b> · by Dr. Omar K. <span class="chg">[20877]</span>'},
+  {ts:"08/09/2026 19:32", ev:"Task created", who:"specialist", pl:'<b>Sound cards, week 3</b> · Dr. Huda M. <span class="chg">[20931]</span>', session:"S-9021"},
+  {ts:"08/09/2026 19:30", ev:"Task created", who:"specialist", pl:'<b>Mirror game: /s/ sounds, 5 minutes</b> · Dr. Huda M. <span class="chg">[20931]</span>', session:"S-9021"},
+  {ts:"07/09/2026 21:39", ev:"Status changed", who:"parent", pl:'<b>Name three things at bath time</b> · <span class="chg">To Do → Incomplete</span>', session:null},
+  {ts:"06/09/2026 19:02", ev:"Status changed", who:"parent", pl:'<b>Blow bubbles: lip rounding</b> · <span class="chg">To Do → Done</span>', session:null},
+  {ts:"03/09/2026 10:12", ev:"Task updated", who:"specialist", pl:'<b>Name three things at bath time</b> · description · Dr. Huda M. <span class="chg">[20931]</span>', session:null},
+  {ts:"01/09/2026 18:10", ev:"Task created", who:"specialist", pl:'<b>Name three things at bath time</b> · Dr. Huda M. <span class="chg">[20931]</span>', session:"S-8877"},
+  {ts:"01/09/2026 18:08", ev:"Task created", who:"specialist", pl:'<b>Blow bubbles: lip rounding</b> · Dr. Huda M. <span class="chg">[20931]</span>', session:"S-8877"},
+  {ts:"25/08/2026 09:40", ev:"Task deleted", who:"specialist", pl:'<b>Clap the syllables</b> · Dr. Huda M. <span class="chg">[20931]</span>', session:null},
+  {ts:"23/08/2026 12:20", ev:"Task created", who:"specialist", pl:'<b>Clap the syllables</b> · Dr. Huda M. <span class="chg">[20931]</span>', session:"S-8710"},
+  {ts:"30/07/2026 09:15", ev:"Status changed", who:"parent", pl:'<b>Read one picture book together</b> · <span class="chg">To Do → Done</span>', session:null},
+  {ts:"24/07/2026 10:00", ev:"Task created", who:"specialist", pl:'<b>Read one picture book together</b> · Dr. Omar K. <span class="chg">[20877]</span>', session:null},
 ];
 
 const GOALS = [
@@ -592,15 +607,17 @@ function openTask(id, shown){
 }
 
 // ---------- activity logs ----------
-function renderLog(logEl, chipsEl, data, notice, pageSize){
+function renderLog(logEl, chipsEl, data, notice, pageSize, withSession){
+  if(withSession) logEl.classList.add('sess');
+  const sess = r => withSession ? `<span class="ss">${r.session ? `<a href="#" title="Session details page">${r.session}</a> <span class="sep">post-session work</span>` : `<span class="sep">— separate edit</span>`}</span>` : '';
   const types = Array.from(new Set(data.map(r => r.ev)));
   let active = new Set(types), page = 0;
   const draw = () => {
     const rows = data.filter(r => active.has(r.ev));
     const slice = pageSize ? rows.slice(page*pageSize, (page+1)*pageSize) : rows;
     logEl.innerHTML = (notice ? `<div class="notice">${notice}</div>` : '')
-      + `<div class="row head"><span>When</span><span>Event</span><span>Details</span></div>`
-      + (slice.length ? slice.map(r => `<div class="row"><span class="ts">${r.ts}</span><span class="ev">${r.ev}</span><span class="pl">${pill(r.who,r.who)} ${r.pl}</span></div>`).join('') : `<div class="empty">No events</div>`)
+      + `<div class="row head"><span>When</span><span>Event</span><span>Details</span>${withSession?'<span>Session</span>':''}</div>`
+      + (slice.length ? slice.map(r => `<div class="row"><span class="ts">${r.ts}</span><span class="ev">${r.ev}</span><span class="pl">${pill(r.who,r.who)} ${r.pl}</span>${sess(r)}</div>`).join('') : `<div class="empty">No events</div>`)
       + (pageSize ? `<div class="pager" id="${logEl.id}-pager"></div>` : '');
     if(pageSize) pager($(`#${logEl.id}-pager`), rows.length, page, pageSize, p => { page = p; draw(); });
   };
@@ -615,46 +632,61 @@ function renderLog(logEl, chipsEl, data, notice, pageSize){
   }
   draw();
 }
-renderLog($('#hp-log'), null, HP_LOG, 'Newest event first. History starts 21/07/2026, when change events began to be recorded; older tasks show created and updated times only. <span class="spec-ref">open question 1</span>', LOG_PAGE);
-renderLog($('#pp-log'), $('#pp-log-chips'), PP_LOG, 'Newest event first. History starts 21/07/2026. <span class="spec-ref">open question 1</span>', LOG_PAGE);
+renderLog($('#hp-log'), null, HP_LOG, 'Newest event first. A session ID means the change was made as post-session work; no session means a separate edit. Comments are in each task, not here. History starts 21/07/2026. <span class="spec-ref">open question 1</span>', LOG_PAGE, true);
+renderLog($('#pp-log'), null, PP_LOG, 'Newest event first. History starts 21/07/2026. <span class="spec-ref">open question 1</span>', LOG_PAGE);
 
 // ---------- progress plan ----------
-function renderPlan(){
+let ppSelected = null;
+const goalsOrdered = () => [...GOALS].sort((a,b) => (a.status==='completed') - (b.status==='completed') || dmy(b.added).localeCompare(dmy(a.added)));
+const gkey = g => g.title;
+
+function renderGoalList(){
   const el = $('#pp-goals');
+  const list = goalsOrdered();
+  el.innerHTML = `<h4>Goals · ${list.length} <span class="spec-ref">§5.1</span></h4>` + list.map(g => `
+    <button class="gcard" data-g="${gkey(g)}" aria-selected="${gkey(g)===ppSelected}">
+      <span class="tt">${g.title} ${pill(g.status, g.status==='active'?'Active':'Completed')}</span>
+      <span class="tm"><span>${g.objectives.length} objective${g.objectives.length===1?'':'s'}</span><span>${g.objectives.filter(o=>o.status==='in_progress').length} in progress</span><span>added ${g.added}</span>${g.completed?`<span>completed ${g.completed}</span>`:''}</span>
+    </button>`).join('');
+  $$('.gcard', el).forEach(b => b.addEventListener('click', () => openGoal(b.dataset.g)));
+}
+
+function openGoal(key){
+  const g = GOALS.find(x => gkey(x)===key);
+  ppSelected = key;
   const ORD = {in_progress:0, not_started:1, completed:2};
-  const goals = [...GOALS].sort((a,b) => (a.status==='completed') - (b.status==='completed'));
-  el.innerHTML = goals.map((g,i) => `
-    <details class="goal" ${i===0?'open':''}>
-      <summary>
-        <span class="gt">${g.title}</span>
-        ${pill(g.status, g.status==='active'?'Active':'Completed')}
-        <span class="gm">${g.objectives.length} objective${g.objectives.length===1?'':'s'} · added ${g.added}${g.completed ? ' · completed '+g.completed : ''}</span>
-      </summary>
-      <div class="gdesc">${g.desc}</div>
-      ${g.objectives.length ? [...g.objectives].sort((a,b)=>ORD[a.status]-ORD[b.status]).map(o => `
-        <div class="obj">
-          <header>
-            <span class="ot">${o.title}</span>
-            ${pill(o.status, o.status)} ${pill('type', o.type)}
-            <span class="mono small muted">added ${o.added}</span>
-          </header>
-          <div class="body">
-            ${o.type==='quantitative' && o.records.length ? `<div class="bar" aria-label="latest ${o.records[0].n} of ${o.target}"><i style="width:${Math.round(100*o.records[0].n/o.target)}%"></i></div>` : ''}
-            ${o.records.length ? o.records.map(r => `<div class="rec"><span class="ts">${r.ts}</span><span><span class="val">${r.val}</span>${o.unit && o.type==='quantitative' ? ` <span class="muted small">${o.unit}</span>` : ''} <span class="muted small">· from session <a href="#" class="mono">${r.session}</a> · ${SPEC.name}</span></span></div>`).join('') : `<div class="muted small">No progress records yet</div>`}
-            <div class="linked">Linked tasks: ${o.tasks.length ? o.tasks.map(id => { const t = TASKS.find(x=>x.id===id); return `<a href="#" data-task="${id}">${t.title.split(':')[0]}</a> ${pill(t.status, STATUS_LABEL[t.status])}`; }).join(' ') : '<span>none</span>'}</div>
-          </div>
-        </div>`).join('') : `<div class="empty">No objectives yet</div>`}
-    </details>`).join('');
-  $$('[data-task]', el).forEach(a => a.addEventListener('click', e => {
+  const objs = [...g.objectives].sort((a,b)=>ORD[a.status]-ORD[b.status]);
+  $('#pp-goal').innerHTML = `
+    <header><h3>${g.title}</h3>${pill(g.status, g.status==='active'?'Active':'Completed')}<span class="mono small muted">added ${g.added}${g.completed ? ' · completed '+g.completed : ''}</span><span class="spec-ref">§5.2</span></header>
+    <div class="gdesc">${g.desc}</div>
+    <dl class="facts">
+      <dt>Objectives</dt><dd>${g.objectives.length} · ${g.objectives.filter(o=>o.status==='completed').length} completed</dd>
+      <dt>Linked tasks</dt><dd>${g.objectives.reduce((n,o)=>n+o.tasks.length,0)}</dd>
+    </dl>
+    ${objs.length ? objs.map(o => `
+      <div class="obj">
+        <header>
+          <span class="ot">${o.title}</span>
+          ${pill(o.status, o.status)} ${pill('type', o.type)}
+          <span class="mono small muted">added ${o.added}</span>
+        </header>
+        <div class="body">
+          ${o.type==='quantitative' && o.records.length ? `<div class="bar" aria-label="latest ${o.records[0].n} of ${o.target}"><i style="width:${Math.round(100*o.records[0].n/o.target)}%"></i></div>` : ''}
+          ${o.records.length ? o.records.map(r => `<div class="rec"><span class="ts">${r.ts}</span><span><span class="val">${r.val}</span>${o.unit && o.type==='quantitative' ? ` <span class="muted small">${o.unit}</span>` : ''} <span class="muted small">· from session <a href="#" class="mono">${r.session}</a> · ${SPEC.name}</span></span></div>`).join('') : `<div class="muted small">No progress records yet</div>`}
+          <div class="linked">Linked tasks: ${o.tasks.length ? o.tasks.map(id => { const t = TASKS.find(x=>x.id===id); return `<a href="#" data-task="${id}">${t.title.split(':')[0]}</a> ${pill(t.status, STATUS_LABEL[t.status])}`; }).join(' ') : '<span>none</span>'}</div>
+        </div>
+      </div>`).join('') : `<div class="empty">No objectives yet</div>`}`;
+  $$('[data-task]', $('#pp-goal')).forEach(a => a.addEventListener('click', e => {
     e.preventDefault();
     const idx = tasksNewest().findIndex(t => t.id===a.dataset.task);
     hpPage = Math.floor(idx / TASK_PAGE);
     $('#tab-hp').click(); $('#hp-view-tasks').click(); openTask(a.dataset.task);
     window.scrollTo({top:0, behavior:'smooth'});
   }));
+  renderGoalList();
 }
 
-renderPlan();
+openGoal(gkey(goalsOrdered()[0]));
 openTask(tasksNewest()[0].id);
 openThread([...THREADS].sort(byNewest('last'))[0].id);
 </script>
