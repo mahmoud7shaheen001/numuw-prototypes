@@ -11,7 +11,7 @@
   --accent:#2E7A69; --accent-ink:#FFFFFF; --accent-soft:#DDEEE9;
   --todo:#A86A12; --todo-soft:#F6E9D3; --done:#2E7A69; --done-soft:#DDEEE9; --incomplete:#B03A3A; --incomplete-soft:#F5DEDE;
   --inprog:#2C66A3; --inprog-soft:#DCE8F5; --notstarted:#66716C; --notstarted-soft:#E6EAE8;
-  --parent:#5B4B8A; --parent-soft:#E9E4F4; --spec:#2E7A69; --spec-soft:#DDEEE9;
+  --parent:#5B4B8A; --parent-soft:#E9E4F4; --spec:#2E7A69; --spec-soft:#DDEEE9; --support:#8A5B2E; --support-soft:#F3E7DA;
   --focus:#2C66A3;
   --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -22,7 +22,7 @@
     --accent:#5FB59F; --accent-ink:#0F1613; --accent-soft:#1F3730;
     --todo:#E0A85A; --todo-soft:#3A2F1C; --done:#5FB59F; --done-soft:#1F3730; --incomplete:#E07B7B; --incomplete-soft:#3B2222;
     --inprog:#7FAEE0; --inprog-soft:#1E2F42; --notstarted:#95A19B; --notstarted-soft:#28302D;
-    --parent:#B3A4E0; --parent-soft:#2B2640; --spec:#5FB59F; --spec-soft:#1F3730;
+    --parent:#B3A4E0; --parent-soft:#2B2640; --spec:#5FB59F; --spec-soft:#1F3730; --support:#D8A56E; --support-soft:#3A2E1F;
   }
 }
 :root[data-theme="dark"]{
@@ -30,7 +30,7 @@
   --accent:#5FB59F; --accent-ink:#0F1613; --accent-soft:#1F3730;
   --todo:#E0A85A; --todo-soft:#3A2F1C; --done:#5FB59F; --done-soft:#1F3730; --incomplete:#E07B7B; --incomplete-soft:#3B2222;
   --inprog:#7FAEE0; --inprog-soft:#1E2F42; --notstarted:#95A19B; --notstarted-soft:#28302D;
-  --parent:#B3A4E0; --parent-soft:#2B2640; --spec:#5FB59F; --spec-soft:#1F3730;
+  --parent:#B3A4E0; --parent-soft:#2B2640; --spec:#5FB59F; --spec-soft:#1F3730; --support:#D8A56E; --support-soft:#3A2E1F;
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.45}
@@ -72,8 +72,11 @@ button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--focus);out
 .pill.not_started{background:var(--notstarted-soft);color:var(--notstarted)}
 .pill.completed{background:var(--done-soft);color:var(--done)}
 .pill.active{background:var(--inprog-soft);color:var(--inprog)}
+.pill.archived{background:var(--notstarted-soft);color:var(--notstarted)}
 .pill.parent{background:var(--parent-soft);color:var(--parent)}
 .pill.specialist{background:var(--spec-soft);color:var(--spec)}
+.pill.support{background:var(--support-soft);color:var(--support)}
+.pill.system{background:var(--surface-2);color:var(--muted)}
 .pill.type{background:var(--surface-2);color:var(--muted)}
 
 /* tabs */
@@ -92,15 +95,14 @@ button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--focus);out
 .chips{display:flex;gap:6px;flex-wrap:wrap}
 .chip{padding:4px 10px;border-radius:999px;border:1px solid var(--line);font-size:12.5px;color:var(--muted);background:var(--surface)}
 .chip[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
-.search{margin-left:auto;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);font:inherit;min-width:180px}
-.search:focus{outline:2px solid var(--focus);outline-offset:1px}
 .spec-ref{font-family:var(--mono);font-size:11px;color:var(--muted);border:1px dashed var(--line-strong);padding:1px 6px;border-radius:4px}
 
-/* table + drawer */
-.split{display:grid;grid-template-columns:1fr;gap:14px}
-.split.open{grid-template-columns:minmax(0,1.25fr) minmax(320px,1fr)}
-@media (max-width:900px){.split.open{grid-template-columns:1fr}}
-.tablewrap{background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow-x:auto}
+/* two panes */
+.split{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(320px,1fr);gap:14px;align-items:start}
+.split.chat{grid-template-columns:minmax(0,1.5fr) minmax(280px,.8fr)}
+@media (max-width:900px){.split,.split.chat{grid-template-columns:1fr}}
+.tablewrap{background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.tablewrap .scroll{overflow-x:auto}
 table{border-collapse:collapse;width:100%;min-width:640px}
 th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
 th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:500;position:sticky;top:0;background:var(--surface)}
@@ -110,10 +112,13 @@ tbody tr[aria-selected="true"]{background:var(--accent-soft)}
 tbody tr:last-child td{border-bottom:0}
 td .t{font-weight:500}
 td .sub{color:var(--muted);font-size:12px}
-.drawer{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:0;align-self:start;position:sticky;top:132px}
+.pager{display:flex;align-items:center;gap:8px;justify-content:flex-end;padding:8px 12px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+.pager button{padding:3px 9px;border:1px solid var(--line);border-radius:5px;background:var(--surface);color:var(--ink)}
+.pager button:disabled{opacity:.4;cursor:default}
+.pager .range{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.drawer{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:0;position:sticky;top:132px}
 .drawer header{display:flex;align-items:baseline;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
 .drawer header h3{margin:0;font-size:15px;font-weight:600;flex:1;text-wrap:balance}
-.drawer .x{color:var(--muted);font-size:18px;line-height:1;padding:2px 6px}
 .dsec{padding:12px 16px;border-bottom:1px solid var(--line)}
 .dsec:last-child{border-bottom:0}
 .dsec h4{margin:0 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:500;display:flex;justify-content:space-between}
@@ -126,6 +131,7 @@ td .sub{color:var(--muted);font-size:12px}
 .msg{max-width:78%;padding:8px 11px;border-radius:10px;background:var(--surface-2);font-size:13.5px}
 .msg.parent{align-self:flex-start;border-bottom-left-radius:3px}
 .msg.specialist{align-self:flex-end;background:var(--accent-soft);border-bottom-right-radius:3px}
+.msg.support{align-self:flex-end;background:var(--support-soft);border-bottom-right-radius:3px}
 .msg .who{font-size:11px;color:var(--muted);margin-bottom:2px;display:flex;gap:6px;align-items:center}
 .msg .meta{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:4px;display:flex;gap:8px;justify-content:flex-end}
 .media{display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface);font-size:12.5px;margin-top:4px}
@@ -135,19 +141,33 @@ td .sub{color:var(--muted);font-size:12px}
 .photo{width:120px;height:80px;border-radius:6px;background:linear-gradient(135deg,var(--line),var(--surface-2));border:1px solid var(--line);margin-top:4px;display:grid;place-items:center;color:var(--muted);font-size:11px}
 .handover{align-self:center;font-size:11.5px;color:var(--muted);padding:4px 10px;border:1px dashed var(--line-strong);border-radius:999px;margin:6px 0}
 .loadolder{align-self:center;font-size:12.5px;color:var(--accent);padding:6px 12px;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
-.chatwrap{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;max-width:820px}
+.chatwrap{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px}
 .chatwrap .thread{min-height:200px}
 .threadstate{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding-bottom:12px;border-bottom:1px solid var(--line);margin-bottom:12px;font-size:12.5px;color:var(--muted)}
+.threadstate b{color:var(--ink);font-weight:500}
+
+/* thread list (right pane of chat) */
+.threads{background:var(--surface);border:1px solid var(--line);border-radius:8px;position:sticky;top:132px;overflow:hidden}
+.threads h4{margin:0;padding:12px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:500;border-bottom:1px solid var(--line);display:flex;justify-content:space-between}
+.tcard{display:grid;gap:4px;padding:10px 14px;border-bottom:1px solid var(--line);cursor:pointer;width:100%;text-align:left}
+.tcard:last-child{border-bottom:0}
+.tcard:hover{background:var(--surface-2)}
+.tcard[aria-selected="true"]{background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent)}
+.tcard .tt{font-weight:500;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tcard .tp{font-size:12px;color:var(--muted)}
+.tcard .tm{font-family:var(--mono);font-size:11px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
+.tcard .unread{font-family:var(--mono);font-size:10.5px;background:var(--parent-soft);color:var(--parent);padding:0 6px;border-radius:999px}
 
 /* activity log */
 .log{background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:hidden}
-.log .row{display:grid;grid-template-columns:150px 150px 1fr;gap:12px;padding:9px 14px;border-bottom:1px solid var(--line);font-size:13px;align-items:baseline}
+.log .row{display:grid;grid-template-columns:150px 170px 1fr;gap:12px;padding:9px 14px;border-bottom:1px solid var(--line);font-size:13px;align-items:baseline}
 .log .row:last-child{border-bottom:0}
 .log .row .ts{font-family:var(--mono);font-size:12px;color:var(--muted)}
 .log .row .ev{font-weight:500}
 .log .row .pl{color:var(--muted)}
 .log .row .pl b{color:var(--ink);font-weight:500}
 .log .row .pl .chg{font-family:var(--mono);font-size:12px}
+.log .row.head{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:500;background:var(--surface)}
 @media (max-width:640px){.log .row{grid-template-columns:1fr}}
 .notice{font-size:12.5px;color:var(--muted);padding:8px 14px;background:var(--surface-2);border-bottom:1px solid var(--line)}
 
@@ -179,7 +199,6 @@ td .sub{color:var(--muted);font-size:12px}
 /* prototype notes */
 .legend{margin-top:28px;border-top:1px solid var(--line);padding-top:12px;font-size:12.5px;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap;align-items:center}
 .legend .k{display:inline-flex;align-items:center;gap:6px}
-.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 @media (prefers-reduced-motion:no-preference){.panel.on{animation:fade .15s ease-out}@keyframes fade{from{opacity:.6}to{opacity:1}}}
 </style>
 </head>
@@ -214,27 +233,17 @@ td .sub{color:var(--muted);font-size:12px}
 
   <!-- §1 tabs -->
   <div class="tabs" role="tablist" aria-label="Profile activity">
-    <button class="tab" role="tab" id="tab-chat" aria-selected="true" aria-controls="p-chat">Chat<span class="n">48</span></button>
+    <button class="tab" role="tab" id="tab-chat" aria-selected="true" aria-controls="p-chat">Chat<span class="n">4 threads</span></button>
     <button class="tab" role="tab" id="tab-hp" aria-selected="false" aria-controls="p-hp">Home Practice<span class="n">5</span></button>
     <button class="tab" role="tab" id="tab-pp" aria-selected="false" aria-controls="p-pp">Progress Plan<span class="n">2 goals</span></button>
   </div>
 
   <!-- §3 chat -->
   <section class="panel on" id="p-chat" role="tabpanel" aria-labelledby="tab-chat">
-    <div class="chatwrap">
-      <div class="threadstate">
-        <span>Thread between <b>Rania H.</b> <span class="mono">[10482]</span> and <b>Dr. Huda M.</b> <span class="mono">[20931]</span> · created 11/07/2026 at discovery booking</span>
-        <span class="spec-ref">§3</span>
-      </div>
-      <div class="thread" id="chat-thread">
-        <button class="loadolder" id="load-older">Load older messages (36 more)</button>
-        <div class="msg specialist"><div class="who"><span class="pill specialist">specialist</span> Dr. Huda M.</div>Good morning Rania. After yesterday's session I added two practice tasks. The mirror game is the important one this week.<div class="meta"><span>09/09/2026 10:14</span><span>read 10:41</span></div></div>
-        <div class="msg parent"><div class="who"><span class="pill parent">parent</span> Rania H.</div>Thank you doctor. She enjoyed the mirror game, I recorded a short clip.<div class="photo">photo · 1.2 MB</div><div class="meta"><span>09/09/2026 18:02</span><span>read 18:30</span></div></div>
-        <div class="msg parent"><div class="who"><span class="pill parent">parent</span> Rania H.</div><div class="media"><span class="ic">voice</span><span class="bar"></span><span class="mono">0:42</span></div><div class="meta"><span>09/09/2026 18:03</span><span>read 18:30</span></div></div>
-        <div class="msg specialist"><div class="who"><span class="pill specialist">specialist</span> Dr. Huda M.</div>Lovely. Keep the sessions short, five minutes is enough. I'll review before Thursday.<div class="meta"><span>09/09/2026 18:35</span><span>read 19:10</span></div></div>
-        <div class="msg specialist"><div class="who"><span class="pill specialist">specialist</span> Dr. Huda M.</div><div class="media"><span class="ic">file</span><span>Sound-cards-week-3.pdf</span><span class="mono muted">380 KB</span></div><div class="meta"><span>12/09/2026 09:20</span><span>read 12:05</span></div></div>
-        <div class="msg parent"><div class="who"><span class="pill parent">parent</span> Rania H.</div>Received. One question, should we skip the practice on the day of the session?<div class="meta"><span>14/09/2026 20:11</span><span class="muted">unread</span></div></div>
-      </div>
+    <div class="toolbar"><span class="muted small">Messages on the left, the parent's threads on the right. The most recently active thread opens first.</span><span class="spec-ref" style="margin-left:auto">§3</span></div>
+    <div class="split chat">
+      <div class="chatwrap" id="chat-pane"></div>
+      <aside class="threads" id="thread-list" aria-label="Threads"></aside>
     </div>
   </section>
 
@@ -249,14 +258,17 @@ td .sub{color:var(--muted);font-size:12px}
     </div>
 
     <div id="hp-tasks-view">
-      <div class="split open" id="hp-split">
+      <div class="split" id="hp-split">
         <div class="tablewrap">
+          <div class="scroll">
           <table id="hp-table">
             <thead><tr>
               <th>Task</th><th>Status</th><th>Linked objective</th><th>From session</th><th>Assigned by</th><th>Assigned at</th><th>Last updated</th><th>Comments</th>
             </tr></thead>
             <tbody></tbody>
           </table>
+          </div>
+          <div class="pager" id="hp-pager"></div>
         </div>
         <aside class="drawer" id="hp-drawer" aria-label="Task detail"></aside>
       </div>
@@ -295,8 +307,8 @@ td .sub{color:var(--muted);font-size:12px}
 
   <div class="legend">
     <span class="k"><span class="spec-ref">§n</span> section of the work item this element comes from</span>
-    <span class="k"><span class="pill parent">parent</span><span class="pill specialist">specialist</span> who acted</span>
-    <span>Sample data, fictional family. Every ID shown is a user ID except the profile and session IDs.</span>
+    <span class="k"><span class="pill parent">parent</span><span class="pill specialist">specialist</span><span class="pill support">support</span> who acted</span>
+    <span>Sample data, fictional family. Every ID shown is a user ID except the profile, session and task IDs. Page sizes are small on purpose so the pagination can be seen.</span>
   </div>
 </div>
 
@@ -305,66 +317,41 @@ td .sub{color:var(--muted);font-size:12px}
 const SPEC = {name:"Dr. Huda M.", id:"20931"};
 const PREV = {name:"Dr. Omar K.", id:"20877"};
 const PARENT = {name:"Rania H.", id:"10482"};
+const SUPPORT = {name:"Numuw Support", id:"support"};
 
 const OBJ = {
-  o1:{goal:"Clear speech sounds", title:"Produce /s/ in words", status:"in_progress", type:"quantitative"},
-  o2:{goal:"Clear speech sounds", title:"Parent models sounds daily", status:"completed", type:"qualitative"},
-  o3:{goal:"Longer sentences", title:"Three-word requests", status:"not_started", type:"quantitative"},
+  o1:{goal:"Clear speech sounds", title:"Produce /s/ in words"},
+  o2:{goal:"Clear speech sounds", title:"Parent models sounds daily"},
+  o3:{goal:"Longer sentences", title:"Three-word requests"},
 };
 
 const TASKS = [
-  {id:"T-511", title:"Mirror game: /s/ sounds, 5 minutes", desc:"Sit in front of a mirror with Noor and take turns saying the ten /s/ words on the card. Five minutes, once a day.", status:"todo", setBy:null, obj:"o1", session:"S-9021", assignedAt:"08/09/2026 19:30", updated:"14/09/2026 20:11", viewed:"09/09/2026 08:15",
+  {id:"T-511", title:"Mirror game: /s/ sounds, 5 minutes", desc:"Sit in front of a mirror with Noor and take turns saying the ten /s/ words on the card. Five minutes, once a day.", status:"todo", setBy:null, obj:"o1", session:"S-9021", assignedBy:SPEC, assignedAt:"08/09/2026 19:30", updated:"14/09/2026 20:11", viewed:"09/09/2026 08:15",
    comments:[
      {who:"parent", text:"She enjoyed it, we did it twice today.", ts:"09/09/2026 18:05", read:"18:30"},
      {who:"specialist", text:"Twice is great. Keep it playful.", ts:"09/09/2026 18:36", read:"19:10"},
+     {who:"parent", text:"Day three done. She is getting the first sound right more often.", ts:"11/09/2026 19:40", read:"20:02"},
+     {who:"specialist", text:"That is exactly the progress I hoped for this week.", ts:"11/09/2026 20:05", read:"20:30"},
      {who:"parent", media:"voice", len:"0:31", ts:"14/09/2026 20:11", read:null},
-   ],
-   history:[
-     {ts:"14/09/2026 20:11", ev:"Comment added", who:"parent", pl:"voice"},
-     {ts:"09/09/2026 18:36", ev:"Comment added", who:"specialist", pl:"text"},
-     {ts:"09/09/2026 18:05", ev:"Comment added", who:"parent", pl:"text"},
-     {ts:"09/09/2026 08:15", ev:"Task viewed by parent", who:"parent", pl:""},
-     {ts:"08/09/2026 19:30", ev:"Task assigned", who:"specialist", pl:"from session S-9021"},
    ]},
-  {id:"T-512", title:"Sound cards, week 3", desc:"Go through the week 3 sound cards after dinner. Mark the ones Noor says clearly.", status:"todo", setBy:null, obj:"o1", session:"S-9021", assignedAt:"08/09/2026 19:32", updated:"12/09/2026 09:20", viewed:"12/09/2026 12:05",
-   comments:[{who:"specialist", media:"file", name:"Sound-cards-week-3.pdf", ts:"12/09/2026 09:20", read:"12:05"}],
-   history:[
-     {ts:"12/09/2026 12:05", ev:"Task viewed by parent", who:"parent", pl:""},
-     {ts:"12/09/2026 09:20", ev:"Comment added", who:"specialist", pl:"file"},
-     {ts:"08/09/2026 19:32", ev:"Task assigned", who:"specialist", pl:"from session S-9021"},
-   ]},
-  {id:"T-498", title:"Name three things at bath time", desc:"At bath time, ask Noor to name three things she can see. Praise any attempt.", status:"incomplete", setBy:"parent", obj:"o3", session:"S-8877", assignedAt:"01/09/2026 18:10", updated:"07/09/2026 21:40", viewed:"02/09/2026 07:50",
-   comments:[{who:"parent", text:"We missed most days this week, she was unwell.", ts:"07/09/2026 21:40", read:"22:15"}],
-   history:[
-     {ts:"07/09/2026 21:40", ev:"Comment added", who:"parent", pl:"text"},
-     {ts:"07/09/2026 21:39", ev:"Status set", who:"parent", pl:"To Do → Incomplete"},
-     {ts:"02/09/2026 07:50", ev:"Task viewed by parent", who:"parent", pl:""},
-     {ts:"01/09/2026 18:10", ev:"Task assigned", who:"specialist", pl:"from session S-8877"},
-   ]},
-  {id:"T-483", title:"Blow bubbles: lip rounding", desc:"Two minutes of bubble blowing before the mirror game.", status:"done", setBy:"parent", obj:"o2", session:"S-8877", assignedAt:"01/09/2026 18:08", updated:"06/09/2026 19:02", viewed:"02/09/2026 07:49",
+  {id:"T-512", title:"Sound cards, week 3", desc:"Go through the week 3 sound cards after dinner. Mark the ones Noor says clearly.", status:"todo", setBy:null, obj:"o1", session:"S-9021", assignedBy:SPEC, assignedAt:"08/09/2026 19:32", updated:"12/09/2026 09:20", viewed:"12/09/2026 12:05",
+   comments:[{who:"specialist", media:"file", name:"Sound-cards-week-3.pdf", ts:"12/09/2026 09:20", read:"12:05"}]},
+  {id:"T-498", title:"Name three things at bath time", desc:"At bath time, ask Noor to name three things she can see. Praise any attempt.", status:"incomplete", setBy:"parent", obj:"o3", session:"S-8877", assignedBy:SPEC, assignedAt:"01/09/2026 18:10", updated:"07/09/2026 21:40", viewed:"02/09/2026 07:50",
+   comments:[{who:"parent", text:"We missed most days this week, she was unwell.", ts:"07/09/2026 21:40", read:"22:15"}]},
+  {id:"T-483", title:"Blow bubbles: lip rounding", desc:"Two minutes of bubble blowing before the mirror game.", status:"done", setBy:"parent", obj:"o2", session:"S-8877", assignedBy:SPEC, assignedAt:"01/09/2026 18:08", updated:"06/09/2026 19:02", viewed:"02/09/2026 07:49",
    comments:[
      {who:"parent", media:"photo", ts:"04/09/2026 17:30", read:"18:02"},
      {who:"specialist", text:"Perfect lip shape. Marking this objective complete.", ts:"04/09/2026 18:03", read:"19:00"},
-   ],
-   history:[
-     {ts:"06/09/2026 19:02", ev:"Status set", who:"parent", pl:"To Do → Done"},
-     {ts:"04/09/2026 18:03", ev:"Comment added", who:"specialist", pl:"text"},
-     {ts:"04/09/2026 17:30", ev:"Comment added", who:"parent", pl:"photo"},
-     {ts:"01/09/2026 18:08", ev:"Task assigned", who:"specialist", pl:"from session S-8877"},
    ]},
-  {id:"T-402", title:"Read one picture book together", desc:"Any book. Point at the pictures and name them slowly.", status:"done", setBy:"specialist", obj:null, session:null, assignedAt:"24/07/2026 10:00", updated:"30/07/2026 09:15", viewed:"25/07/2026 21:10",
-   comments:[],
-   history:[
-     {ts:"30/07/2026 09:15", ev:"Status set", who:"specialist", pl:"To Do → Done"},
-     {ts:"25/07/2026 21:10", ev:"Task viewed by parent", who:"parent", pl:""},
-     {ts:"24/07/2026 10:00", ev:"Task assigned", who:"specialist", pl:"assigned by "+PREV.name+" [ "+PREV.id+" ]"},
-   ]},
+  {id:"T-402", title:"Read one picture book together", desc:"Any book. Point at the pictures and name them slowly.", status:"done", setBy:"specialist", obj:null, session:null, assignedBy:PREV, assignedAt:"24/07/2026 10:00", updated:"30/07/2026 09:15", viewed:"25/07/2026 21:10", comments:[]},
 ];
 
 const HP_LOG = [
   {ts:"14/09/2026 20:11", ev:"Comment added", who:"parent", pl:'<b>Mirror game</b> · voice'},
   {ts:"12/09/2026 12:05", ev:"Task viewed by parent", who:"parent", pl:'<b>Sound cards, week 3</b>'},
   {ts:"12/09/2026 09:20", ev:"Comment added", who:"specialist", pl:'<b>Sound cards, week 3</b> · file'},
+  {ts:"11/09/2026 20:05", ev:"Comment added", who:"specialist", pl:'<b>Mirror game</b> · text'},
+  {ts:"11/09/2026 19:40", ev:"Comment added", who:"parent", pl:'<b>Mirror game</b> · text'},
   {ts:"09/09/2026 18:36", ev:"Comment added", who:"specialist", pl:'<b>Mirror game</b> · text'},
   {ts:"09/09/2026 18:05", ev:"Comment added", who:"parent", pl:'<b>Mirror game</b> · text'},
   {ts:"09/09/2026 08:15", ev:"Task viewed by parent", who:"parent", pl:'<b>Mirror game</b>'},
@@ -409,8 +396,8 @@ const GOALS = [
 
 const PP_LOG = [
   {ts:"13/09/2026 11:40", ev:"Progress recorded", who:"specialist", pl:'<b>Produce /s/ in words</b> · <span class="chg">7 / 10</span> · from session <a href="#">S-9021</a>'},
-  {ts:"06/09/2026 19:25", ev:"Goal added", who:"specialist", pl:'<b>Longer sentences</b> · from session <a href="#">S-8877</a>'},
   {ts:"06/09/2026 19:26", ev:"Objective added", who:"specialist", pl:'<b>Longer sentences › Three-word requests</b> · quantitative'},
+  {ts:"06/09/2026 19:25", ev:"Goal added", who:"specialist", pl:'<b>Longer sentences</b> · from session <a href="#">S-8877</a>'},
   {ts:"06/09/2026 19:20", ev:"Objective status changed", who:"specialist", pl:'<b>Parent models sounds daily</b> · <span class="chg">in_progress → completed</span>'},
   {ts:"06/09/2026 19:18", ev:"Progress recorded", who:"specialist", pl:'<b>Produce /s/ in words</b> · <span class="chg">5 / 10</span> · from session <a href="#">S-8877</a>'},
   {ts:"05/09/2026 21:02", ev:"Plan viewed by parent", who:"parent", pl:''},
@@ -422,96 +409,73 @@ const PP_LOG = [
   {ts:"21/07/2026 16:28", ev:"Goal added", who:"specialist", pl:'<b>Clear speech sounds</b>'},
 ];
 
+// threads: the parent's conversations that touch this profile
+const THREADS = [
+  {id:"C-771", kind:"specialist", title:"Dr. Huda M.", participants:[PARENT, SPEC], state:"active", created:"11/07/2026", createdBy:"discovery booking", last:"14/09/2026 20:11", count:48, unreadParent:0, unreadOther:1,
+   older:[
+     {who:"parent", name:PARENT.name, text:"Hello doctor, this is Noor's mother. Looking forward to Thursday.", ts:"19/08/2026 09:02", read:"09:40"},
+   ],
+   marker:{after:0, text:"Specialist changed: Dr. Omar K. [20877] → Dr. Huda M. [20931] · 18/08/2026"},
+   messages:[
+     {who:"specialist", name:SPEC.name, text:"Good morning Rania. After yesterday's session I added two practice tasks. The mirror game is the important one this week.", ts:"09/09/2026 10:14", read:"10:41"},
+     {who:"parent", name:PARENT.name, text:"Thank you doctor. She enjoyed the mirror game, I recorded a short clip.", media:"photo", ts:"09/09/2026 18:02", read:"18:30"},
+     {who:"parent", name:PARENT.name, media:"voice", len:"0:42", ts:"09/09/2026 18:03", read:"18:30"},
+     {who:"specialist", name:SPEC.name, text:"Lovely. Keep the sessions short, five minutes is enough. I'll review before Thursday.", ts:"09/09/2026 18:35", read:"19:10"},
+     {who:"specialist", name:SPEC.name, media:"file", fname:"Sound-cards-week-3.pdf", size:"380 KB", ts:"12/09/2026 09:20", read:"12:05"},
+     {who:"parent", name:PARENT.name, text:"Received. One question, should we skip the practice on the day of the session?", ts:"14/09/2026 20:11", read:null},
+   ]},
+  {id:"C-812", kind:"group", title:"Care team", participants:[PARENT, SPEC, SUPPORT], state:"active", created:"20/08/2026", createdBy:"Numuw Support", last:"21/08/2026 11:15", count:5, unreadParent:0, unreadOther:0,
+   older:[],
+   messages:[
+     {who:"support", name:SUPPORT.name, text:"Hello Rania, this group brings you, Dr. Huda and our team together for the handover week. Ask anything here.", ts:"20/08/2026 10:30", read:"10:55"},
+     {who:"specialist", name:SPEC.name, text:"Hello Rania, I am Huda. I have read Noor's file and Dr. Omar's notes. Same time Thursday works for me.", ts:"20/08/2026 12:02", read:"12:40"},
+     {who:"parent", name:PARENT.name, text:"Thank you both. Thursday is fine.", ts:"20/08/2026 13:10", read:"13:25"},
+     {who:"support", name:SUPPORT.name, text:"Booked. We will close this group after the first session, your direct chat with Dr. Huda stays open.", ts:"21/08/2026 11:15", read:"11:20"},
+   ]},
+  {id:"C-640", kind:"support", title:"Numuw Support", participants:[PARENT, SUPPORT], state:"active", created:"03/07/2026", createdBy:"account creation", last:"17/08/2026 16:44", count:12, unreadParent:0, unreadOther:0,
+   older:[
+     {who:"parent", name:PARENT.name, text:"How do I change the session reminder time?", ts:"12/07/2026 21:03", read:"21:30"},
+     {who:"support", name:SUPPORT.name, text:"Settings › Notifications › Reminder. It is set to 30 minutes by default.", ts:"12/07/2026 21:35", read:"21:50"},
+   ],
+   messages:[
+     {who:"parent", name:PARENT.name, text:"Dr. Omar told me he is leaving. What happens to Noor's plan?", ts:"17/08/2026 15:20", read:"15:32"},
+     {who:"support", name:SUPPORT.name, text:"Nothing is lost. Her plan and home practice move to the new specialist, who will read everything before your first session. We will introduce her tomorrow.", ts:"17/08/2026 16:44", read:"17:05"},
+   ]},
+  {id:"C-512", kind:"specialist", title:"Dr. Omar K.", participants:[PARENT, PREV], state:"archived", created:"11/07/2026", createdBy:"discovery booking", last:"16/08/2026 14:50", count:31, unreadParent:0, unreadOther:0,
+   older:[
+     {who:"specialist", name:PREV.name, text:"Welcome Rania. I will send the first practice task after our discovery session.", ts:"11/07/2026 16:20", read:"16:45"},
+   ],
+   messages:[
+     {who:"parent", name:PARENT.name, text:"She read the whole book with me tonight, pointing at everything.", ts:"29/07/2026 20:12", read:"20:40"},
+     {who:"specialist", name:PREV.name, text:"Wonderful. I will mark that task done and we build on it Thursday.", ts:"30/07/2026 09:15", read:"09:30"},
+     {who:"specialist", name:PREV.name, text:"Noor did well today. I will hand over your file to my colleague next week, she will introduce herself here.", ts:"16/08/2026 14:50", read:"15:12"},
+   ]},
+];
+
 // ---------- helpers ----------
 const $ = (s, r=document) => r.querySelector(s);
 const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
 const STATUS_LABEL = {todo:"To Do", done:"Done", incomplete:"Incomplete"};
 const pill = (cls, txt) => `<span class="pill ${cls}">${txt}</span>`;
-const person = (who) => who==="parent" ? `${PARENT.name} <span class="mono muted">[${PARENT.id}]</span>` : `${SPEC.name} <span class="mono muted">[${SPEC.id}]</span>`;
+const dmy = (d) => { const [dd,mm,rest] = d.split('/'); const [yy,hm='00:00'] = rest.split(' '); return `${yy}-${mm}-${dd} ${hm}`; };
+const byNewest = (k) => (a,b) => dmy(b[k]).localeCompare(dmy(a[k]));
+const person = (p) => `${p.name} <span class="mono muted">[${p.id}]</span>`;
+const TASK_PAGE = 3, LOG_PAGE = 8, COMMENT_PAGE = 2, CHAT_PAGE = 4;
+
+function pager(el, total, page, size, onPage){
+  const pages = Math.max(1, Math.ceil(total/size));
+  const from = total ? page*size+1 : 0, to = Math.min(total, (page+1)*size);
+  el.innerHTML = `<span class="range">${from}–${to} of ${total}</span>
+    <button ${page===0?'disabled':''} data-p="${page-1}" aria-label="Previous page">‹</button>
+    <button ${page>=pages-1?'disabled':''} data-p="${page+1}" aria-label="Next page">›</button>`;
+  $$('button', el).forEach(b => b.addEventListener('click', () => onPage(+b.dataset.p)));
+}
 
 // ---------- tabs ----------
 $$('.tab').forEach(t => t.addEventListener('click', () => {
   $$('.tab').forEach(x => x.setAttribute('aria-selected', String(x===t)));
   $$('.panel').forEach(p => p.classList.toggle('on', p.id === t.getAttribute('aria-controls')));
 }));
-
-// ---------- chat ----------
-$('#load-older').addEventListener('click', (e) => {
-  const older = [
-    `<div class="msg parent"><div class="who">${pill('parent','parent')} ${PARENT.name}</div>Hello doctor, this is Noor's mother. Looking forward to Thursday.<div class="meta"><span>19/08/2026 09:02</span><span>read 09:40</span></div></div>`,
-    `<div class="handover">Specialist changed: Dr. Omar K. [20877] → Dr. Huda M. [20931] · 18/08/2026</div>`,
-    `<div class="msg specialist"><div class="who">${pill('specialist','specialist')} Dr. Omar K.</div>Noor did well today. I will hand over your file to my colleague next week, she will introduce herself here.<div class="meta"><span>16/08/2026 14:50</span><span>read 15:12</span></div></div>`,
-  ];
-  e.target.insertAdjacentHTML('afterend', older.reverse().join(''));
-  e.target.textContent = "Load older messages (33 more)";
-});
-
-// ---------- home practice ----------
-let hpSelected = null;
-const dmy = (d) => { const [dd,mm,rest] = d.split('/'); const [yy,hm='00:00'] = rest.split(' '); return `${yy}-${mm}-${dd} ${hm}`; };
-const COMMENT_PAGE = 2;
-
-function renderTasks(){
-  const tb = $('#hp-table tbody');
-  const rows = [...TASKS].sort((a,b) => dmy(b.assignedAt).localeCompare(dmy(a.assignedAt)));
-  if(!rows.length){ tb.innerHTML = `<tr><td colspan="8" class="empty">No tasks yet</td></tr>`; return; }
-  tb.innerHTML = rows.map(t => `
-    <tr data-id="${t.id}" tabindex="0" aria-selected="${t.id===hpSelected}">
-      <td><div class="t">${t.title}</div><div class="sub mono">${t.id}</div></td>
-      <td>${pill(t.status, STATUS_LABEL[t.status])}</td>
-      <td>${t.obj ? `<div>${OBJ[t.obj].goal}</div><div class="sub">› ${OBJ[t.obj].title}</div>` : '<span class="muted">—</span>'}</td>
-      <td>${t.session ? `<a href="#" class="mono" title="Session details page">${t.session}</a>` : '<span class="muted">—</span>'}</td>
-      <td>${t.id==="T-402" ? `${PREV.name} <span class="sub mono">[${PREV.id}]</span>` : `${SPEC.name} <span class="sub mono">[${SPEC.id}]</span>`}</td>
-      <td class="mono small">${t.assignedAt}</td>
-      <td class="mono small">${t.updated}</td>
-      <td class="mono">${t.comments.length}</td>
-    </tr>`).join('');
-  $$('tbody tr', $('#hp-table')).forEach(tr => {
-    const open = () => openDrawer(tr.dataset.id);
-    tr.addEventListener('click', open);
-    tr.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); open(); } });
-  });
-}
-
-function renderComment(c){
-  let body = '';
-  if(c.text) body = c.text;
-  if(c.media==='voice') body += `<div class="media"><span class="ic">voice</span><span class="bar"></span><span class="mono">${c.len}</span></div>`;
-  if(c.media==='photo') body += `<div class="photo">photo</div>`;
-  if(c.media==='file') body += `<div class="media"><span class="ic">file</span><span>${c.name}</span></div>`;
-  return `<div class="msg ${c.who}"><div class="who">${pill(c.who,c.who)} ${c.who==='parent'?PARENT.name:SPEC.name}</div>${body}<div class="meta"><span>${c.ts}</span><span>${c.read ? 'read '+c.read : 'unread'}</span></div></div>`;
-}
-
-function openDrawer(id, shown){
-  const t = TASKS.find(x => x.id===id);
-  hpSelected = id;
-  const d = $('#hp-drawer');
-  const n = shown || COMMENT_PAGE;
-  const visible = t.comments.slice(Math.max(0, t.comments.length - n));
-  const older = t.comments.length - visible.length;
-  d.innerHTML = `
-    <header><h3>${t.title}</h3><span class="mono small muted">${t.id}</span></header>
-    <div class="dsec">
-      <h4>Task <span class="spec-ref">§4.2</span></h4>
-      <dl class="facts">
-        <dt>Status</dt><dd>${pill(t.status, STATUS_LABEL[t.status])} ${t.setBy ? `<span class="muted small">set by ${t.setBy}</span>` : ''}</dd>
-        <dt>Description</dt><dd>${t.desc}</dd>
-        <dt>Linked objective</dt><dd>${t.obj ? `${OBJ[t.obj].goal} › ${OBJ[t.obj].title}` : '<span class="muted">—</span>'}</dd>
-        <dt>From session</dt><dd>${t.session ? `<a href="#" class="mono">${t.session}</a>` : '<span class="muted">—</span>'}</dd>
-        <dt>Assigned by</dt><dd>${t.id==="T-402" ? `${PREV.name} <span class="mono muted">[${PREV.id}]</span>` : person('specialist')}</dd>
-        <dt>Assigned at</dt><dd class="mono">${t.assignedAt}</dd>
-        <dt>Last updated</dt><dd class="mono">${t.updated}</dd>
-        <dt>Parent viewed</dt><dd class="mono">${t.viewed || 'Not viewed'}</dd>
-      </dl>
-    </div>
-    <div class="dsec">
-      <h4>Comments · ${t.comments.length}</h4>
-      ${t.comments.length ? `<div class="thread">${older ? `<button class="loadolder" id="hp-older">Load older comments (${older} more)</button>` : ''}${visible.map(renderComment).join('')}</div>` : `<div class="muted small">No comments</div>`}
-    </div>`;
-  const ob = $('#hp-older'); if(ob) ob.addEventListener('click', () => openDrawer(id, n + COMMENT_PAGE));
-  renderTasks();
-}
-
 
 function setSeg(onBtn, offBtn, showEl, hideEl){
   onBtn.setAttribute('aria-pressed','true'); offBtn.setAttribute('aria-pressed','false');
@@ -522,26 +486,137 @@ $('#hp-view-log').addEventListener('click', () => setSeg($('#hp-view-log'), $('#
 $('#pp-view-plan').addEventListener('click', () => setSeg($('#pp-view-plan'), $('#pp-view-log'), $('#pp-plan-view'), $('#pp-log-view')));
 $('#pp-view-log').addEventListener('click', () => setSeg($('#pp-view-log'), $('#pp-view-plan'), $('#pp-log-view'), $('#pp-plan-view')));
 
+// ---------- messages (chat and comments share one renderer) ----------
+function renderMsg(m){
+  let body = '';
+  if(m.text) body = m.text;
+  if(m.media==='voice') body += `<div class="media"><span class="ic">voice</span><span class="bar"></span><span class="mono">${m.len}</span></div>`;
+  if(m.media==='photo') body += `<div class="photo">photo · 1.2 MB</div>`;
+  if(m.media==='file') body += `<div class="media"><span class="ic">file</span><span>${m.fname||m.name}</span>${m.size?`<span class="mono muted">${m.size}</span>`:''}</div>`;
+  const name = m.name || (m.who==='parent' ? PARENT.name : m.who==='support' ? SUPPORT.name : SPEC.name);
+  return `<div class="msg ${m.who}"><div class="who">${pill(m.who,m.who)} ${name}</div>${body}<div class="meta"><span>${m.ts}</span><span>${m.read ? 'read '+m.read : 'unread'}</span></div></div>`;
+}
+
+// ---------- chat ----------
+let chatSelected = null, chatShown = CHAT_PAGE;
+
+function renderThreadList(){
+  const el = $('#thread-list');
+  const list = [...THREADS].sort(byNewest('last'));
+  el.innerHTML = `<h4>Threads · ${list.length} <span class="spec-ref">§3.1</span></h4>` + list.map(t => `
+    <button class="tcard" data-id="${t.id}" aria-selected="${t.id===chatSelected}">
+      <span class="tt">${t.title} ${pill(t.kind, t.kind)} ${pill(t.state, t.state)}</span>
+      <span class="tp">${t.participants.map(p => p.id==='support' ? p.name : `${p.name} [${p.id}]`).join(' · ')}</span>
+      <span class="tm"><span>last ${t.last}</span><span>${t.count} msgs</span>${t.unreadOther ? `<span class="unread">${t.unreadOther} unread by ${t.kind==='specialist'?'specialist':'team'}</span>` : ''}</span>
+    </button>`).join('');
+  $$('.tcard', el).forEach(b => b.addEventListener('click', () => { chatShown = CHAT_PAGE; openThread(b.dataset.id); }));
+}
+
+function openThread(id){
+  const t = THREADS.find(x => x.id===id);
+  chatSelected = id;
+  const all = [...t.older, ...t.messages];
+  const visible = all.slice(Math.max(0, all.length - chatShown));
+  const older = all.length - visible.length;
+  const olderTotal = t.count - visible.length;
+  let html = visible.map(renderMsg);
+  if(t.marker && chatShown > t.messages.length){
+    html.splice(visible.length - t.messages.length, 0, `<div class="handover">${t.marker.text}</div>`);
+  }
+  $('#chat-pane').innerHTML = `
+    <div class="threadstate">
+      <span>${t.kind==='group' ? 'Group' : 'Thread'} <b>${t.title}</b> <span class="mono">${t.id}</span> · ${t.participants.map(p => `<b>${p.name}</b>${p.id==='support'?'':` <span class="mono">[${p.id}]</span>`}`).join(' and ')} · created ${t.created} at ${t.createdBy} · ${pill(t.state, t.state)}</span>
+    </div>
+    <div class="thread">
+      ${olderTotal > 0 ? `<button class="loadolder" id="chat-older">Load older messages (${olderTotal} more)</button>` : `<span class="handover">Start of thread</span>`}
+      ${html.join('')}
+    </div>`;
+  const ob = $('#chat-older'); if(ob) ob.addEventListener('click', () => { chatShown += CHAT_PAGE; openThread(id); });
+  renderThreadList();
+}
+
+// ---------- home practice ----------
+let hpSelected = null, hpPage = 0;
+const tasksNewest = () => [...TASKS].sort(byNewest('assignedAt'));
+
+function renderTasks(){
+  const tb = $('#hp-table tbody');
+  const all = tasksNewest();
+  const rows = all.slice(hpPage*TASK_PAGE, (hpPage+1)*TASK_PAGE);
+  tb.innerHTML = rows.map(t => `
+    <tr data-id="${t.id}" tabindex="0" aria-selected="${t.id===hpSelected}">
+      <td><div class="t">${t.title}</div><div class="sub mono">${t.id}</div></td>
+      <td>${pill(t.status, STATUS_LABEL[t.status])}</td>
+      <td>${t.obj ? `<div>${OBJ[t.obj].goal}</div><div class="sub">› ${OBJ[t.obj].title}</div>` : '<span class="muted">—</span>'}</td>
+      <td>${t.session ? `<a href="#" class="mono" title="Session details page">${t.session}</a>` : '<span class="muted">—</span>'}</td>
+      <td>${t.assignedBy.name} <span class="sub mono">[${t.assignedBy.id}]</span></td>
+      <td class="mono small">${t.assignedAt}</td>
+      <td class="mono small">${t.updated}</td>
+      <td class="mono">${t.comments.length}</td>
+    </tr>`).join('');
+  $$('tbody tr', $('#hp-table')).forEach(tr => {
+    const open = () => openTask(tr.dataset.id);
+    tr.addEventListener('click', open);
+    tr.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); open(); } });
+  });
+  pager($('#hp-pager'), all.length, hpPage, TASK_PAGE, p => { hpPage = p; const first = tasksNewest()[p*TASK_PAGE]; openTask(first.id); });
+}
+
+function openTask(id, shown){
+  const t = TASKS.find(x => x.id===id);
+  hpSelected = id;
+  const n = shown || COMMENT_PAGE;
+  const visible = t.comments.slice(Math.max(0, t.comments.length - n));
+  const older = t.comments.length - visible.length;
+  $('#hp-drawer').innerHTML = `
+    <header><h3>${t.title}</h3><span class="mono small muted">${t.id}</span></header>
+    <div class="dsec">
+      <h4>Task <span class="spec-ref">§4.2</span></h4>
+      <dl class="facts">
+        <dt>Status</dt><dd>${pill(t.status, STATUS_LABEL[t.status])} ${t.setBy ? `<span class="muted small">set by ${t.setBy}</span>` : ''}</dd>
+        <dt>Description</dt><dd>${t.desc}</dd>
+        <dt>Linked objective</dt><dd>${t.obj ? `${OBJ[t.obj].goal} › ${OBJ[t.obj].title}` : '<span class="muted">—</span>'}</dd>
+        <dt>From session</dt><dd>${t.session ? `<a href="#" class="mono">${t.session}</a>` : '<span class="muted">—</span>'}</dd>
+        <dt>Assigned by</dt><dd>${person(t.assignedBy)}</dd>
+        <dt>Assigned at</dt><dd class="mono">${t.assignedAt}</dd>
+        <dt>Last updated</dt><dd class="mono">${t.updated}</dd>
+        <dt>Parent viewed</dt><dd class="mono">${t.viewed || 'Not viewed'}</dd>
+      </dl>
+    </div>
+    <div class="dsec">
+      <h4>Comments · ${t.comments.length}</h4>
+      ${t.comments.length ? `<div class="thread">${older ? `<button class="loadolder" id="hp-older">Load older comments (${older} more)</button>` : ''}${visible.map(renderMsg).join('')}</div>` : `<div class="muted small">No comments</div>`}
+    </div>`;
+  const ob = $('#hp-older'); if(ob) ob.addEventListener('click', () => openTask(id, n + COMMENT_PAGE));
+  renderTasks();
+}
+
 // ---------- activity logs ----------
-function renderLog(logEl, chipsEl, data, notice){
+function renderLog(logEl, chipsEl, data, notice, pageSize){
   const types = Array.from(new Set(data.map(r => r.ev)));
-  let active = new Set(types);
+  let active = new Set(types), page = 0;
   const draw = () => {
     const rows = data.filter(r => active.has(r.ev));
-    logEl.innerHTML = (notice ? `<div class="notice">${notice}</div>` : '') + (rows.length ? rows.map(r => `
-      <div class="row"><span class="ts">${r.ts}</span><span class="ev">${r.ev}</span><span class="pl">${pill(r.who,r.who)} ${r.pl}</span></div>`).join('') : `<div class="empty">No events of the selected types</div>`);
+    const slice = pageSize ? rows.slice(page*pageSize, (page+1)*pageSize) : rows;
+    logEl.innerHTML = (notice ? `<div class="notice">${notice}</div>` : '')
+      + `<div class="row head"><span>When</span><span>Event</span><span>Details</span></div>`
+      + (slice.length ? slice.map(r => `<div class="row"><span class="ts">${r.ts}</span><span class="ev">${r.ev}</span><span class="pl">${pill(r.who,r.who)} ${r.pl}</span></div>`).join('') : `<div class="empty">No events</div>`)
+      + (pageSize ? `<div class="pager" id="${logEl.id}-pager"></div>` : '');
+    if(pageSize) pager($(`#${logEl.id}-pager`), rows.length, page, pageSize, p => { page = p; draw(); });
   };
-  if(chipsEl){ chipsEl.innerHTML = types.map(t => `<button class="chip" data-t="${t}" aria-pressed="true">${t}</button>`).join(''); }
-  if(chipsEl) $$('.chip', chipsEl).forEach(c => c.addEventListener('click', () => {
-    const on = c.getAttribute('aria-pressed')==='true';
-    c.setAttribute('aria-pressed', String(!on));
-    if(on) active.delete(c.dataset.t); else active.add(c.dataset.t);
-    draw();
-  }));
+  if(chipsEl){
+    chipsEl.innerHTML = types.map(t => `<button class="chip" data-t="${t}" aria-pressed="true">${t}</button>`).join('');
+    $$('.chip', chipsEl).forEach(c => c.addEventListener('click', () => {
+      const on = c.getAttribute('aria-pressed')==='true';
+      c.setAttribute('aria-pressed', String(!on));
+      if(on) active.delete(c.dataset.t); else active.add(c.dataset.t);
+      page = 0; draw();
+    }));
+  }
   draw();
 }
-renderLog($('#hp-log'), null, HP_LOG, 'History starts 21/07/2026, when change events began to be recorded. Older tasks show created and updated times only. <span class="spec-ref">open question 1</span>');
-renderLog($('#pp-log'), $('#pp-log-chips'), PP_LOG, 'History starts 21/07/2026. <span class="spec-ref">open question 1</span>');
+renderLog($('#hp-log'), null, HP_LOG, 'Newest event first. History starts 21/07/2026, when change events began to be recorded; older tasks show created and updated times only. <span class="spec-ref">open question 1</span>', LOG_PAGE);
+renderLog($('#pp-log'), $('#pp-log-chips'), PP_LOG, 'Newest event first. History starts 21/07/2026. <span class="spec-ref">open question 1</span>', LOG_PAGE);
 
 // ---------- progress plan ----------
 function renderPlan(){
@@ -572,13 +647,16 @@ function renderPlan(){
     </details>`).join('');
   $$('[data-task]', el).forEach(a => a.addEventListener('click', e => {
     e.preventDefault();
-    $('#tab-hp').click(); $('#hp-view-tasks').click(); openDrawer(a.dataset.task);
+    const idx = tasksNewest().findIndex(t => t.id===a.dataset.task);
+    hpPage = Math.floor(idx / TASK_PAGE);
+    $('#tab-hp').click(); $('#hp-view-tasks').click(); openTask(a.dataset.task);
     window.scrollTo({top:0, behavior:'smooth'});
   }));
 }
 
 renderPlan();
-openDrawer([...TASKS].sort((a,b) => dmy(b.assignedAt).localeCompare(dmy(a.assignedAt)))[0].id);
+openTask(tasksNewest()[0].id);
+openThread([...THREADS].sort(byNewest('last'))[0].id);
 </script>
 
 </body>
