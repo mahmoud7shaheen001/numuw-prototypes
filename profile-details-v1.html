@@ -410,18 +410,18 @@ const GOALS = [
 ];
 
 const PP_LOG = [
-  {ts:"13/09/2026 11:40", ev:"Progress recorded", who:"specialist", pl:'<b>Produce /s/ in words</b> · <span class="chg">7 / 10</span> · from session <a href="#">S-9021</a>'},
-  {ts:"06/09/2026 19:26", ev:"Objective added", who:"specialist", pl:'<b>Longer sentences › Three-word requests</b> · quantitative'},
-  {ts:"06/09/2026 19:25", ev:"Goal added", who:"specialist", pl:'<b>Longer sentences</b> · from session <a href="#">S-8877</a>'},
-  {ts:"06/09/2026 19:20", ev:"Objective status changed", who:"specialist", pl:'<b>Parent models sounds daily</b> · <span class="chg">in_progress → completed</span>'},
-  {ts:"06/09/2026 19:18", ev:"Progress recorded", who:"specialist", pl:'<b>Produce /s/ in words</b> · <span class="chg">5 / 10</span> · from session <a href="#">S-8877</a>'},
-  {ts:"05/09/2026 21:02", ev:"Plan viewed by parent", who:"parent", pl:''},
-  {ts:"23/08/2026 12:10", ev:"Goal completed", who:"specialist", pl:'<b>Settled into sessions</b>'},
-  {ts:"23/08/2026 12:05", ev:"Progress recorded", who:"specialist", pl:'<b>Produce /s/ in words</b> · <span class="chg">3 / 10</span> · from session <a href="#">S-8710</a>'},
-  {ts:"18/08/2026 10:00", ev:"Handed to a new specialist", who:"specialist", pl:'Dr. Omar K. <span class="chg">[20877]</span> → Dr. Huda M. <span class="chg">[20931]</span>'},
-  {ts:"22/07/2026 08:40", ev:"Objective viewed by parent", who:"parent", pl:'<b>Produce /s/ in words</b>'},
-  {ts:"21/07/2026 16:30", ev:"Objective added", who:"specialist", pl:'<b>Clear speech sounds › Produce /s/ in words</b> · quantitative'},
-  {ts:"21/07/2026 16:28", ev:"Goal added", who:"specialist", pl:'<b>Clear speech sounds</b>'},
+  {ts:"13/09/2026 11:40", ev:"Progress recorded", who:"specialist", pl:'<b>Produce /s/ in words</b> · <span class="chg">7 / 10</span> · Dr. Huda M. <span class="chg">[20931]</span>', session:"S-9021"},
+  {ts:"06/09/2026 19:26", ev:"Objective created", who:"specialist", pl:'<b>Longer sentences › Three-word requests</b> · quantitative · Dr. Huda M. <span class="chg">[20931]</span>', session:"S-8877"},
+  {ts:"06/09/2026 19:25", ev:"Goal created", who:"specialist", pl:'<b>Longer sentences</b> · Dr. Huda M. <span class="chg">[20931]</span>', session:"S-8877"},
+  {ts:"06/09/2026 19:20", ev:"Objective updated", who:"specialist", pl:'<b>Parent models sounds daily</b> · status <span class="chg">in_progress → completed</span> · Dr. Huda M. <span class="chg">[20931]</span>', session:"S-8877"},
+  {ts:"06/09/2026 19:18", ev:"Progress recorded", who:"specialist", pl:'<b>Produce /s/ in words</b> · <span class="chg">5 / 10</span> · Dr. Huda M. <span class="chg">[20931]</span>', session:"S-8877"},
+  {ts:"28/08/2026 09:05", ev:"Goal updated", who:"specialist", pl:'<b>Clear speech sounds</b> · description · Dr. Huda M. <span class="chg">[20931]</span>', session:null},
+  {ts:"25/08/2026 09:42", ev:"Objective deleted", who:"specialist", pl:'<b>Clear speech sounds › Clap the syllables</b> · Dr. Huda M. <span class="chg">[20931]</span>', session:null},
+  {ts:"23/08/2026 12:10", ev:"Goal updated", who:"specialist", pl:'<b>Settled into sessions</b> · state <span class="chg">Active → Completed</span> · Dr. Omar K. <span class="chg">[20877]</span>', session:"S-8710"},
+  {ts:"23/08/2026 12:05", ev:"Progress recorded", who:"specialist", pl:'<b>Produce /s/ in words</b> · <span class="chg">3 / 10</span> · Dr. Omar K. <span class="chg">[20877]</span>', session:"S-8710"},
+  {ts:"23/08/2026 12:00", ev:"Objective created", who:"specialist", pl:'<b>Clear speech sounds › Clap the syllables</b> · qualitative · Dr. Omar K. <span class="chg">[20877]</span>', session:"S-8710"},
+  {ts:"21/07/2026 16:30", ev:"Objective created", who:"specialist", pl:'<b>Clear speech sounds › Produce /s/ in words</b> · quantitative · Dr. Omar K. <span class="chg">[20877]</span>', session:null},
+  {ts:"21/07/2026 16:28", ev:"Goal created", who:"specialist", pl:'<b>Clear speech sounds</b> · Dr. Omar K. <span class="chg">[20877]</span>', session:null},
 ];
 
 // threads: the parent's conversations that touch this profile
@@ -633,7 +633,7 @@ function renderLog(logEl, chipsEl, data, notice, pageSize, withSession){
   draw();
 }
 renderLog($('#hp-log'), null, HP_LOG, 'Newest event first. A session ID means the change was made as post-session work; no session means a separate edit. Comments are in each task, not here. History starts 21/07/2026. <span class="spec-ref">open question 1</span>', LOG_PAGE, true);
-renderLog($('#pp-log'), null, PP_LOG, 'Newest event first. History starts 21/07/2026. <span class="spec-ref">open question 1</span>', LOG_PAGE);
+renderLog($('#pp-log'), null, PP_LOG, 'Newest event first. Specialist changes only. A session ID means the change was made as post-session work; no session means a separate edit. History starts 21/07/2026. <span class="spec-ref">open question 1</span>', LOG_PAGE, true);
 
 // ---------- progress plan ----------
 let ppSelected = null;
